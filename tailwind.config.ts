@@ -88,16 +88,15 @@ export default {
             height: '0',
           },
         },
-        'color-wave': {
+        'gradient-loop': {
           '0%': { backgroundPosition: '0% 50%' },
-          '50%': { backgroundPosition: '100% 50%' },
-          '100%': { backgroundPosition: '0% 50%' },
+          '100%': { backgroundPosition: '200% 50%' },
         },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
-        'color-wave': 'color-wave 3s ease-in-out infinite',
+        'gradient-loop': 'gradient-loop 2s linear infinite',
       },
     },
   },
