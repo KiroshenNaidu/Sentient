@@ -91,7 +91,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             className="min-h-[200px] resize-y"
             disabled={isLoading || !!fileName}
           />
-          <Button type="submit" className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-secondary to-accent bg-[length:200%_auto] enabled:hover:animate-color-wave enabled:hover:text-primary-foreground" disabled={isLoading || !text.trim()}>
+          <Button type="submit" className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-secondary to-accent bg-[length:200%_auto] enabled:hover:animate-color-wave" disabled={isLoading || !text.trim()}>
             {isLoading && !fileName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Analyze Text
           </Button>
