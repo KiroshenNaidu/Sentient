@@ -47,8 +47,11 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             texts = content.split('\n').filter(Boolean);
           }
           setFileTexts(texts);
-          if(texts.length > 0) {
-            setText(`File '${file.name}' with ${texts.length} entr${texts.length > 1 ? 'ies' : 'y'} loaded and ready to be analyzed.`);
+           if(texts.length > 0) {
+            toast({
+              title: 'File Loaded',
+              description: `File '${file.name}' with ${texts.length} entr${texts.length > 1 ? 'ies' : 'y'} loaded. Click Analyze.`,
+            });
           }
 
         } catch(error) {
@@ -110,8 +113,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
     setIsDraggingOver(false);
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = () => {
     if (fileTexts.length > 0) {
       onAnalyze(fileTexts);
     } else if (text.trim()) {
@@ -131,7 +133,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
         <CardDescription>Enter text directly, or upload a file to get started.</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-4">
           <Textarea
             placeholder="Paste your text here..."
             value={text}
@@ -145,11 +147,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             className="min-h-[200px] resize-y"
             disabled={isLoading}
           />
-          <Button type="submit" className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={isLoading || !canAnalyze}>
-            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Analyze
-          </Button>
-        </form>
+        </div>
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />
@@ -192,6 +190,10 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
           </Label>
           <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept=".txt,.csv,.json" disabled={isLoading}/>
         </div>
+         <Button onClick={handleSubmit} className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={isLoading || !canAnalyze}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Analyze
+          </Button>
       </CardContent>
     </Card>
   );
