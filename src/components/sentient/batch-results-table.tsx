@@ -7,6 +7,9 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Smile, Frown, Meh } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+
 
 const sentimentConfig = {
   positive: {
@@ -68,6 +71,60 @@ export function BatchResultsTable({ results }: BatchResultsTableProps) {
     document.body.removeChild(link);
   };
   
+  const exportToTXT = () => {
+    let textContent = `Sentiment Analysis Results\n\n`;
+    results.forEach(res => {
+        textContent += `--------------------------------------------------\n`;
+        textContent += `ID: ${res.id}\n`;
+        textContent += `Text: ${res.text}\n`;
+        textContent += `Sentiment: ${res.sentiment}\n`;
+        textContent += `Confidence: ${(res.confidence * 100).toFixed(0)}%\n`;
+        textContent += `Drivers: ${res.drivers.join(', ')}\n`;
+        textContent += `Explanation: ${res.explanation}\n`;
+        textContent += `--------------------------------------------------\n\n`;
+    });
+    const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'sentiment_analysis_results.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    
+    doc.text("Sentiment Analysis Results", 14, 16);
+    
+    const tableData = results.map(res => [
+        res.sentiment,
+        `${(res.confidence * 100).toFixed(0)}%`,
+        res.text,
+        res.drivers.join(', '),
+        res.explanation,
+    ]);
+
+    (doc as any).autoTable({
+        head: [['Sentiment', 'Confidence', 'Text', 'Drivers', 'Explanation']],
+        body: tableData,
+        startY: 22,
+        styles: {
+            fontSize: 8,
+        },
+        headStyles: {
+            fillColor: [38, 50, 56]
+        },
+        columnStyles: {
+            2: { cellWidth: 60 },
+            4: { cellWidth: 40 }
+        }
+    });
+
+    doc.save('sentiment_analysis_results.pdf');
+  };
+
   return (
     <div className="space-y-4">
        <div className="flex justify-end">
@@ -81,6 +138,8 @@ export function BatchResultsTable({ results }: BatchResultsTableProps) {
           <DropdownMenuContent>
             <DropdownMenuItem onClick={exportToJSON}>Export as JSON</DropdownMenuItem>
             <DropdownMenuItem onClick={exportToCSV}>Export as CSV</DropdownMenuItem>
+            <DropdownMenuItem onClick={exportToTXT}>Export as TXT</DropdownMenuItem>
+            <DropdownMenuItem onClick={exportToPDF}>Export as PDF</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>
