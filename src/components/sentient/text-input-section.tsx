@@ -16,6 +16,7 @@ type TextInputSectionProps = {
 
 export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionProps) {
   const [text, setText] = useState('');
+  const [fileTexts, setFileTexts] = useState<string[]>([]);
   const [fileName, setFileName] = useState('');
   const [isReadingFile, startFileReadTransition] = useTransition();
   const { toast } = useToast();
@@ -24,37 +25,46 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
     const file = event.target.files?.[0];
     if (file) {
       setFileName(file.name);
-      setText(''); // Clear textarea when a file is selected
+      setText(''); 
+      setFileTexts([]);
       
       startFileReadTransition(() => {
         const reader = new FileReader();
         reader.onload = (e) => {
           const content = e.target?.result as string;
           try {
+            let texts: string[] = [];
             if (file.type === 'application/json') {
               const jsonData = JSON.parse(content);
               if (Array.isArray(jsonData)) {
-                const texts = jsonData.map(item => typeof item === 'string' ? item : item.text).filter(Boolean);
-                onAnalyze(texts);
+                texts = jsonData.map(item => typeof item === 'string' ? item : item.text).filter(Boolean);
               } else {
                  throw new Error('JSON file must contain an array of strings or objects with a "text" property.');
               }
             } else if (file.type === 'text/csv') {
               const rows = content.split('\n').slice(1); // Skip header
-              const texts = rows.map(row => row.split(',')[0]).filter(Boolean);
-              onAnalyze(texts);
+              texts = rows.map(row => row.split(',')[0]).filter(Boolean);
             } else { // txt file
-              onAnalyze([content]);
+              texts = [content];
             }
+            setFileTexts(texts);
+            if(texts.length > 0 && texts.length <= 1) {
+              setText(texts.join('\n'));
+            } else if (texts.length > 1) {
+              setText(`File '${file.name}' with ${texts.length} entries loaded and ready to be analyzed.`);
+            }
+
           } catch(error) {
             const message = error instanceof Error ? error.message : 'Unknown error';
             toast({ variant: 'destructive', title: 'File Read Error', description: `Could not parse ${file.name}: ${message}` });
             setFileName('');
+            setFileTexts([]);
           }
         };
         reader.onerror = () => {
           toast({ variant: 'destructive', title: 'File Read Error', description: `Could not read the file ${file.name}.` });
           setFileName('');
+          setFileTexts([]);
         };
         reader.readAsText(file);
       });
@@ -64,14 +74,17 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (text.trim()) {
+    if (fileTexts.length > 0) {
+      onAnalyze(fileTexts);
+    } else if (text.trim()) {
       onAnalyze([text]);
     } else {
-      toast({ variant: 'destructive', title: 'Input Error', description: 'Please enter some text to analyze.' });
+      toast({ variant: 'destructive', title: 'Input Error', description: 'Please enter some text or upload a file to analyze.' });
     }
   };
 
   const isLoading = isProcessing || isReadingFile;
+  const canAnalyze = (text.trim() !== '' || fileTexts.length > 0);
 
   return (
     <Card>
@@ -86,14 +99,17 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             value={text}
             onChange={(e) => {
               setText(e.target.value)
-              if(fileName) setFileName('');
+              if(fileName) {
+                setFileName('');
+                setFileTexts([]);
+              }
             }}
             className="min-h-[200px] resize-y"
-            disabled={isLoading || !!fileName}
+            disabled={isLoading}
           />
-          <Button type="submit" className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={isLoading || !text.trim()}>
-            {isLoading && !fileName ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
-            Analyze Text
+          <Button type="submit" className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={isLoading || !canAnalyze}>
+            {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+            Analyze
           </Button>
         </form>
         <div className="relative">
@@ -108,10 +124,10 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
           <Label htmlFor="file-upload" className={!isLoading ? "cursor-pointer" : "cursor-not-allowed"}>
             <div className="flex items-center justify-center w-full h-32 border-2 border-dashed rounded-lg hover:border-primary transition-colors data-[disabled=true]:hover:border-dashed data-[disabled=true]:opacity-50" data-disabled={isLoading}>
               <div className="text-center">
-                {isLoading && fileName ? (
+                {isReadingFile && fileName ? (
                   <>
                     <Loader2 className="mx-auto h-8 w-8 text-muted-foreground animate-spin" />
-                    <p className="mt-2 text-sm text-muted-foreground">Processing {fileName}...</p>
+                    <p className="mt-2 text-sm text-muted-foreground">Reading {fileName}...</p>
                   </>
                 ) : (
                   <>
@@ -120,7 +136,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
                       <span className="font-semibold text-primary">Click to upload a file</span>
                     </p>
                     <p className="text-xs text-muted-foreground">.txt, .csv, or .json</p>
-                    {fileName && !isLoading && <p className="text-xs text-accent-foreground mt-1">{fileName} ready. Submit above.</p>}
+                    {fileName && !isReadingFile && <p className="text-xs text-accent-foreground mt-1">{fileName} loaded. Click Analyze.</p>}
                   </>
                 )}
               </div>
