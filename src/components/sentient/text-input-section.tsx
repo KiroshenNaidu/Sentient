@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload } from 'lucide-react';
+import { Loader2, Upload, FileCheck } from 'lucide-react';
 
 type TextInputSectionProps = {
   onAnalyze: (texts: string[]) => void;
@@ -47,13 +47,6 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             texts = content.split('\n').filter(Boolean);
           }
           setFileTexts(texts);
-           if(texts.length > 0) {
-            toast({
-              title: 'File Loaded',
-              description: `File '${file.name}' with ${texts.length} entr${texts.length > 1 ? 'ies' : 'y'} loaded. Click Analyze.`,
-            });
-          }
-
         } catch(error) {
           const message = error instanceof Error ? error.message : 'Unknown error';
           toast({ variant: 'destructive', title: 'File Read Error', description: `Could not parse ${file.name}: ${message}` });
@@ -124,7 +117,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
   };
 
   const isLoading = isProcessing || isReadingFile;
-  const canAnalyze = (text.trim() !== '' || fileTexts.length > 0);
+  const canAnalyze = (text.trim() !== '' || fileTexts.length > 0) && !isLoading;
 
   return (
     <Card>
@@ -156,7 +149,7 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
             <span className="bg-card px-2 text-muted-foreground">Or</span>
           </div>
         </div>
-        <div>
+        <div className="space-y-4">
           <Label 
             htmlFor="file-upload" 
             className={!isLoading ? "cursor-pointer" : "cursor-not-allowed"}
@@ -170,11 +163,17 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
               data-disabled={isLoading}
             >
               <div className="text-center">
-                {isReadingFile && fileName ? (
+                {isReadingFile ? (
                   <>
                     <Loader2 className="mx-auto h-8 w-8 text-muted-foreground animate-spin" />
                     <p className="mt-2 text-sm text-muted-foreground">Reading {fileName}...</p>
                   </>
+                ) : fileName && fileTexts.length > 0 ? (
+                    <>
+                        <FileCheck className="mx-auto h-8 w-8 text-green-500" />
+                        <p className="mt-2 text-sm font-medium text-foreground">{fileName}</p>
+                        <p className="text-xs text-muted-foreground">{fileTexts.length} entr{fileTexts.length > 1 ? 'ies' : 'y'} loaded</p>
+                    </>
                 ) : (
                   <>
                     <Upload className="mx-auto h-8 w-8 text-muted-foreground" />
@@ -182,18 +181,17 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
                       <span className="font-semibold text-primary">{isDraggingOver ? 'Drop the file here' : 'Click or drag & drop'}</span>
                     </p>
                     <p className="text-xs text-muted-foreground">.txt, .csv, or .json</p>
-                    {fileName && !isReadingFile && <p className="text-xs text-accent-foreground mt-1">{fileName} loaded. Click Analyze.</p>}
                   </>
                 )}
               </div>
             </div>
           </Label>
           <Input id="file-upload" type="file" className="hidden" onChange={handleFileChange} accept=".txt,.csv,.json" disabled={isLoading}/>
-        </div>
-         <Button onClick={handleSubmit} className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={isLoading || !canAnalyze}>
+          <Button onClick={handleSubmit} className="w-full text-primary-foreground disabled:text-primary-foreground/70 bg-gradient-to-r from-primary via-purple-500 to-primary bg-[length:200%_auto] enabled:hover:animate-gradient-loop" disabled={!canAnalyze}>
             {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
             Analyze
           </Button>
+        </div>
       </CardContent>
     </Card>
   );
