@@ -20,9 +20,21 @@ export function SentimentAnalysisDashboard() {
   const { toast } = useToast();
 
   const handleAnalyze = (texts: string[]) => {
-    if (texts.length === 0 || texts.every(t => !t.trim())) {
+    const validTexts = texts.filter(t => t.trim() !== '');
+    if (validTexts.length === 0) {
       toast({ variant: 'destructive', title: 'Input Error', description: 'No text to analyze.' });
       return;
+    }
+
+    // Client-side validation for coherent text
+    const hasCoherentText = validTexts.some(t => /[a-zA-Z]/.test(t));
+    if (!hasCoherentText) {
+        toast({
+            variant: 'destructive',
+            title: 'Invalid Input',
+            description: 'Please enter text with words to analyze sentiment.',
+        });
+        return;
     }
 
     setResults([]);
@@ -30,24 +42,22 @@ export function SentimentAnalysisDashboard() {
     startTransition(async () => {
       try {
         let newResults: AnalysisResult[] = [];
-        if (texts.length === 1) {
-          const analysisData = await analyzeSingleText(texts[0]);
+        if (validTexts.length === 1) {
+          const analysisData = await analyzeSingleText(validTexts[0]);
           newResults = [
             {
               id: `${Date.now()}-0`,
-              text: texts[0],
+              text: validTexts[0],
               ...analysisData,
             },
           ];
-          setActiveTab('single');
         } else {
-          const analysisData = await analyzeMultipleTexts(texts);
+          const analysisData = await analyzeMultipleTexts(validTexts);
           newResults = analysisData.map((data, index) => ({
             id: `${Date.now()}-${index}`,
-            text: texts[index],
+            text: validTexts[index],
             ...data,
           }));
-          setActiveTab('batch');
         }
         setResults(newResults);
       } catch (error) {
@@ -56,6 +66,12 @@ export function SentimentAnalysisDashboard() {
       }
     });
   };
+
+  useEffect(() => {
+    if (results.length > 0) {
+      setActiveTab(results.length > 1 ? 'batch' : 'single');
+    }
+  }, [results]);
 
   const singleResult = results.length > 0 ? results[0] : null;
 

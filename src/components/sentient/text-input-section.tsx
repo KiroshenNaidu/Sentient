@@ -109,10 +109,8 @@ export function TextInputSection({ onAnalyze, isProcessing }: TextInputSectionPr
   const handleSubmit = () => {
     if (fileTexts.length > 0) {
       onAnalyze(fileTexts);
-    } else if (text.trim()) {
-      onAnalyze([text]);
     } else {
-      toast({ variant: 'destructive', title: 'Input Error', description: 'Please enter some text or upload a file to analyze.' });
+      onAnalyze([text]);
     }
   };
 
