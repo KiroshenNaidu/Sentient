@@ -1,7 +1,7 @@
 'use client';
 
 import type { AnalysisResult } from '@/lib/types';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, LabelList } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from '@/components/ui/chart';
 
@@ -25,12 +25,27 @@ type SentimentDistributionChartProps = {
 };
 
 export function SentimentDistributionChart({ results }: SentimentDistributionChartProps) {
-  const data = [
+  const sentimentCounts = {
+    positive: results.filter((r) => r.sentiment === 'positive').length,
+    negative: results.filter((r) => r.sentiment === 'negative').length,
+    neutral: results.filter((r) => r.sentiment === 'neutral').length,
+  };
+
+  const chartData = [
     {
-      name: 'Sentiments',
-      positive: results.filter((r) => r.sentiment === 'positive').length,
-      negative: results.filter((r) => r.sentiment === 'negative').length,
-      neutral: results.filter((r) => r.sentiment === 'neutral').length,
+      name: 'Positive',
+      count: sentimentCounts.positive,
+      fill: 'var(--color-positive)',
+    },
+    {
+      name: 'Negative',
+      count: sentimentCounts.negative,
+      fill: 'var(--color-negative)',
+    },
+    {
+      name: 'Neutral',
+      count: sentimentCounts.neutral,
+      fill: 'var(--color-neutral)',
     },
   ];
 
@@ -43,24 +58,27 @@ export function SentimentDistributionChart({ results }: SentimentDistributionCha
       <CardContent>
         <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
           <ResponsiveContainer width="100%" height={200}>
-            <BarChart accessibilityLayer data={data} layout="vertical" margin={{ left: 10 }}>
-              <CartesianGrid horizontal={false} />
-              <YAxis
+            <BarChart accessibilityLayer data={chartData} layout="horizontal" margin={{ top: 20 }}>
+              <CartesianGrid vertical={false} />
+              <XAxis
                 dataKey="name"
-                type="category"
                 tickLine={false}
                 tickMargin={10}
                 axisLine={false}
-                hide
               />
-              <XAxis dataKey="positive" type="number" hide />
+              <YAxis hide />
               <ChartTooltip
                 cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
+                content={<ChartTooltipContent hideLabel />}
               />
-              <Bar dataKey="positive" fill="var(--color-positive)" radius={5} name="Positive" />
-              <Bar dataKey="negative" fill="var(--color-negative)" radius={5} name="Negative" />
-              <Bar dataKey="neutral" fill="var(--color-neutral)" radius={5} name="Neutral" />
+              <Bar dataKey="count" radius={8} barSize={60}>
+                 <LabelList
+                  position="top"
+                  offset={12}
+                  className="fill-foreground"
+                  fontSize={12}
+                />
+              </Bar>
             </BarChart>
           </ResponsiveContainer>
         </ChartContainer>
