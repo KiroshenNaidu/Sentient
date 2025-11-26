@@ -26,8 +26,13 @@ export function SentimentAnalysisDashboard() {
     }
 
     setResults([]);
-    const newTab = texts.length > 1 ? 'batch' : 'single';
-    setActiveTab(newTab);
+    // This was causing the tab to switch automatically.
+    // I'm now setting it based on user's current view.
+    if (texts.length > 1 && activeTab !== 'batch') {
+      setActiveTab('batch');
+    } else if (texts.length <= 1 && activeTab !== 'single') {
+      setActiveTab('single');
+    }
     
     startTransition(async () => {
       try {
@@ -49,7 +54,7 @@ export function SentimentAnalysisDashboard() {
     });
   };
 
-  const singleResult = results.length === 1 ? results[0] : null;
+  const singleResult = results.length > 0 ? results[0] : null;
 
   return (
     <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -84,7 +89,7 @@ export function SentimentAnalysisDashboard() {
                 <Card><CardContent className="p-6"><Skeleton className="h-48 w-full" /></CardContent></Card>
                 <Card><CardContent className="p-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
               </div>
-            ) : results.length > 1 ? (
+            ) : results.length > 0 ? (
               <>
                 <SentimentDistributionChart results={results} />
                 <BatchResultsTable results={results} />
