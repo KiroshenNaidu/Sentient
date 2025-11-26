@@ -52,28 +52,31 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
   const mainSentiment = result.sentiment;
   const mainConfidence = result.confidence * 100;
 
-  const otherSentiments = (['positive', 'negative', 'neutral'] as Sentiment[]).filter(s => s !== mainSentiment);
-  
   let scores: Record<Sentiment, number> = {
     positive: 0,
     negative: 0,
-    neutral: 0
+    neutral: 0,
   };
   scores[mainSentiment] = mainConfidence;
-
-  // Distribute the remaining confidence among the other sentiments
+  
   const remainingConfidence = 100 - mainConfidence;
+  const otherSentiments = (['positive', 'negative', 'neutral'] as Sentiment[]).filter(s => s !== mainSentiment);
+
   if (otherSentiments.length > 0) {
-    if (otherSentiments.length === 2) {
-      // A simple split, could be more sophisticated
-      scores[otherSentiments[0]] = remainingConfidence * 0.7;
-      scores[otherSentiments[1]] = remainingConfidence * 0.3;
-    } else { // length is 1
-      scores[otherSentiments[0]] = remainingConfidence;
+    // A more robust way to distribute the remainder
+    if (result.sentiment === 'positive') {
+        scores.negative = remainingConfidence * 0.75;
+        scores.neutral = remainingConfidence * 0.25;
+    } else if (result.sentiment === 'negative') {
+        scores.positive = remainingConfidence * 0.25;
+        scores.neutral = remainingConfidence * 0.75;
+    } else { // neutral
+        scores.positive = remainingConfidence * 0.5;
+        scores.negative = remainingConfidence * 0.5;
     }
   }
 
-  // Normalize to ensure sum is 100
+  // Final check to ensure it all adds up to exactly 100, handling any minor floating point issues.
   const totalScore = scores.positive + scores.negative + scores.neutral;
   if (totalScore > 0) {
     scores.positive = (scores.positive / totalScore) * 100;
@@ -97,9 +100,9 @@ export function ResultsDisplay({ result }: ResultsDisplayProps) {
       <CardContent className="p-6 space-y-6">
         <div className="space-y-4">
           <h4 className="font-medium">Sentiment Breakdown</h4>
-          <SentimentBar sentiment="positive" value={scores.positive} />
-          <SentimentBar sentiment="negative" value={scores.negative} />
-          <SentimentBar sentiment="neutral" value={scores.neutral} />
+          <SentimentBar sentiment="positive" value={Math.round(scores.positive)} />
+          <SentimentBar sentiment="negative" value={Math.round(scores.negative)} />
+          <SentimentBar sentiment="neutral" value={Math.round(scores.neutral)} />
         </div>
         
         <div className="space-y-2">

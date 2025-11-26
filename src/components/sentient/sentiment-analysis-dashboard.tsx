@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import type { AnalysisResult } from '@/lib/types';
 import { analyzeSingleText, analyzeMultipleTexts } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -20,7 +20,7 @@ export function SentimentAnalysisDashboard() {
   const { toast } = useToast();
 
   const handleAnalyze = (texts: string[]) => {
-    if (texts.length === 0) {
+    if (texts.length === 0 || texts.every(t => !t.trim())) {
       toast({ variant: 'destructive', title: 'Input Error', description: 'No text to analyze.' });
       return;
     }
@@ -54,6 +54,14 @@ export function SentimentAnalysisDashboard() {
       }
     });
   };
+
+  useEffect(() => {
+    if (results.length > 1) {
+      setActiveTab('batch');
+    } else {
+      setActiveTab('single');
+    }
+  }, [results]);
 
   const singleResult = results.length > 0 ? results[0] : null;
 
