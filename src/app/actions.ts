@@ -1,8 +1,7 @@
 'use server';
 
 import { analyzeTextSentiment } from '@/ai/flows/analyze-text-sentiment';
-import { extractKeySentimentDrivers } from '@/ai/flows/extract-key-sentiment-drivers';
-import { explainSentimentScores } from '@/ai/flows/explain-sentiment-scores';
+import { analyzeTextSentimentBatch } from '@/ai/flows/analyze-text-sentiment-batch';
 import type { AnalysisResult, Sentiment } from '@/lib/types';
 
 export async function analyzeSingleText(
@@ -13,37 +12,49 @@ export async function analyzeSingleText(
       throw new Error('Input text cannot be empty.');
     }
 
-    const sentimentResult = await analyzeTextSentiment({ text });
-    if (!sentimentResult || !sentimentResult.sentiment) {
+    const result = await analyzeTextSentiment({ text });
+     if (!result) {
       throw new Error('Failed to analyze sentiment.');
-    }
-
-    const driversResult = await extractKeySentimentDrivers({
-      text,
-      sentiment: sentimentResult.sentiment as Sentiment,
-    });
-    if (!driversResult || !driversResult.drivers) {
-      throw new Error('Failed to extract keywords.');
-    }
-
-    const explanationResult = await explainSentimentScores({
-      text,
-      keywords: driversResult.drivers,
-    });
-    if (!explanationResult || !explanationResult.explanation) {
-      throw new Error('Failed to generate explanation.');
     }
     
     return {
-      sentiment: sentimentResult.sentiment as Sentiment,
-      confidence: sentimentResult.confidence,
-      drivers: driversResult.drivers,
-      explanation: explanationResult.explanation,
+      sentiment: result.sentiment as Sentiment,
+      confidence: result.confidence,
+      drivers: result.drivers,
+      explanation: result.explanation,
     };
   } catch (error) {
     console.error('Error in analyzeSingleText:', error);
     if (error instanceof Error) {
         throw new Error(`Analysis failed: ${error.message}`);
+    }
+    throw new Error('An unknown error occurred during analysis.');
+  }
+}
+
+export async function analyzeMultipleTexts(
+  texts: string[]
+): Promise<Omit<AnalysisResult, 'id' | 'text'>[]> {
+  try {
+    if (texts.length === 0) {
+      throw new Error('Input text cannot be empty.');
+    }
+
+    const results = await analyzeTextSentimentBatch({ texts });
+    if (!results || results.length === 0) {
+      throw new Error('Failed to analyze sentiments.');
+    }
+
+    return results.map(result => ({
+      sentiment: result.sentiment as Sentiment,
+      confidence: result.confidence,
+      drivers: result.drivers,
+      explanation: result.explanation,
+    }));
+  } catch (error) {
+    console.error('Error in analyzeMultipleTexts:', error);
+    if (error instanceof Error) {
+      throw new Error(`Analysis failed: ${error.message}`);
     }
     throw new Error('An unknown error occurred during analysis.');
   }

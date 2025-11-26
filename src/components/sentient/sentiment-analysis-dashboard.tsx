@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from 'react';
 import type { AnalysisResult } from '@/lib/types';
-import { analyzeSingleText } from '@/app/actions';
+import { analyzeSingleText, analyzeMultipleTexts } from '@/app/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent } from '@/components/ui/card';
@@ -26,26 +26,27 @@ export function SentimentAnalysisDashboard() {
     }
 
     setResults([]);
-    // This was causing the tab to switch automatically.
-    // I'm now setting it based on user's current view.
-    if (texts.length > 1 && activeTab !== 'batch') {
-      setActiveTab('batch');
-    } else if (texts.length <= 1 && activeTab !== 'single') {
-      setActiveTab('single');
-    }
     
     startTransition(async () => {
       try {
-        const analysisPromises = texts.map(async (text, index) => {
-          const analysisData = await analyzeSingleText(text);
-          return {
+        let newResults: AnalysisResult[] = [];
+        if (texts.length === 1) {
+          const analysisData = await analyzeSingleText(texts[0]);
+          newResults = [
+            {
+              id: `${Date.now()}-0`,
+              text: texts[0],
+              ...analysisData,
+            },
+          ];
+        } else {
+          const analysisData = await analyzeMultipleTexts(texts);
+          newResults = analysisData.map((data, index) => ({
             id: `${Date.now()}-${index}`,
-            text,
-            ...analysisData,
-          };
-        });
-
-        const newResults = await Promise.all(analysisPromises);
+            text: texts[index],
+            ...data,
+          }));
+        }
         setResults(newResults);
       } catch (error) {
         const message = error instanceof Error ? error.message : 'An unknown error occurred.';
