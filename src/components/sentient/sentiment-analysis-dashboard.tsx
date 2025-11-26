@@ -39,6 +39,7 @@ export function SentimentAnalysisDashboard() {
               ...analysisData,
             },
           ];
+          setActiveTab('single');
         } else {
           const analysisData = await analyzeMultipleTexts(texts);
           newResults = analysisData.map((data, index) => ({
@@ -46,6 +47,7 @@ export function SentimentAnalysisDashboard() {
             text: texts[index],
             ...data,
           }));
+          setActiveTab('batch');
         }
         setResults(newResults);
       } catch (error) {
@@ -54,14 +56,6 @@ export function SentimentAnalysisDashboard() {
       }
     });
   };
-
-  useEffect(() => {
-    if (results.length > 1) {
-      setActiveTab('batch');
-    } else {
-      setActiveTab('single');
-    }
-  }, [results]);
 
   const singleResult = results.length > 0 ? results[0] : null;
 
@@ -73,8 +67,8 @@ export function SentimentAnalysisDashboard() {
         </div>
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="single">Single Analysis</TabsTrigger>
-            <TabsTrigger value="batch">Batch Analysis</TabsTrigger>
+            <TabsTrigger value="single" disabled={results.length > 1}>Single Analysis</TabsTrigger>
+            <TabsTrigger value="batch" disabled={results.length > 0 && results.length <= 1}>Batch Analysis</TabsTrigger>
           </TabsList>
           <TabsContent value="single">
             {isProcessing ? (
@@ -98,7 +92,7 @@ export function SentimentAnalysisDashboard() {
                 <Card><CardContent className="p-6"><Skeleton className="h-48 w-full" /></CardContent></Card>
                 <Card><CardContent className="p-6"><Skeleton className="h-64 w-full" /></CardContent></Card>
               </div>
-            ) : results.length > 0 ? (
+            ) : results.length > 1 ? (
               <>
                 <SentimentDistributionChart results={results} />
                 <BatchResultsTable results={results} />
