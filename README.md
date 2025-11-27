@@ -1,76 +1,53 @@
-# Firebase Studio
+# Sentient  
+Lightweight AI-Powered Sentiment Analysis Tool
 
-This is a NextJS starter in Firebase Studio.
-
-To get started, take a look at src/app/page.tsx.
-
-# Sentient
-
-Sentient is a lightweight AI-powered sentiment analysis tool built in TypeScript. It uses the Gemini API to classify messages as **positive**, **negative**, or **neutral**, and provides a confidence rating along with explanation and drivers for each analysis.  
+Sentient is a web application built with Next.js and TypeScript for classifying text messages as positive, negative, or neutral. Each analysis returns a confidence score, drivers, and an explanation.
 
 ---
 
 ## Features
 
-- **Single and Multiple Message Analysis**: Analyze one message at a time or in batches.  
-- **Confidence Scoring**: Each prediction includes a confidence score.  
-- **Insightful Drivers & Explanation**: Provides reasons behind the sentiment classification.  
-- **High TypeScript Coverage**: 98% of the codebase uses TypeScript for type safety.  
-- **Lightweight & Fast**: Minimal dependencies and optimized for performance.  
+- Single-message sentiment analysis  
+- Batch sentiment analysis (multiple messages)  
+- Confidence scoring for each classification  
+- Explanation and drivers for classifications  
+- Fully typed with TypeScript  
+- Lightweight and easy to integrate  
 
 ---
 
-## Installation
+## Technology Stack
 
-```bash
-git clone <repository-url>
-cd sentient
-npm install
+- Next.js  
+- TypeScript  
+- Tailwind CSS / PostCSS  
+- Node.js  
+- API integration (e.g., Gemini API for sentiment classification)  
 
-Usage
+---
 
-Import the analysis functions and use them in your project:
+## Repository Structure
 
-import { analyzeSingleText, analyzeMultipleTexts } from './path-to-your-file';
+/public # Static assets
+/src # Application source code
+/docs # Optional documentation
+package.json # Dependencies and scripts
+next.config.ts # Next.js configuration
+tailwind.config.ts # Tailwind CSS configuration
+tsconfig.json # TypeScript configuration
+apphosting.yaml # Hosting configuration (if applicable)
+.gitignore # Ignored files
+.env # Environment variables (not committed)
+README.md # Documentation and setup instructions
 
-// Analyze a single message
-const singleResult = await analyzeSingleText("I really enjoy using this app.");
-console.log(singleResult);
-// Example output:
-// {
-//   sentiment: "positive",
-//   confidence: 0.92,
-//   drivers: ["enjoy", "positive context"],
-//   explanation: "The message expresses satisfaction and positive emotion."
-// }
 
-// Analyze multiple messages
-const multipleResults = await analyzeMultipleTexts([
-  "I love this!",
-  "This is terrible.",
-  "It's okay."
-]);
-console.log(multipleResults);
-// Example output:
-// [
-//   { sentiment: "positive", confidence: 0.95, drivers: ["love"], explanation: "Expresses strong positive emotion." },
-//   { sentiment: "negative", confidence: 0.88, drivers: ["terrible"], explanation: "Expresses negative sentiment." },
-//   { sentiment: "neutral", confidence: 0.80, drivers: [], explanation: "Message is neutral or balanced." }
-// ]
-Requirements
+---
 
-Node.js >= 18
+## Getting Started
 
-Gemini API key configured in your environment
+1. **Clone the repository**  
 
-Make sure your Gemini API key is properly set up to allow the app to analyze sentiment.
+git clone https://github.com/KiroshenNaidu/Sentient.git
+cd Sentient
 
-Contributing
-
-Contributions are welcome. You can:
-
-Submit bug reports or feature requests via GitHub issues.
-
-Submit pull requests for bug fixes or improvements.
-
-Please ensure TypeScript type safety is maintained.
+2 **Install dependencies**
