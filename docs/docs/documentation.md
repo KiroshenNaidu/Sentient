@@ -83,7 +83,14 @@ Early prompts returned free-form text that was hard to parse. We refined the pro
 This made it easier for the UI to display results reliably.
 
 
-
 ## 4. User Guide
 
-_(To be completed.)_
+This section explains how an end user can interact with the deployed application.
+### 4.1 Accessing the app
+The app is currently deployed at:
+- **Production URL:** https://sentien.netlify.app/
+### 4.2 Basic workflow
+1. Open the website in a browser.
+2. Choose whether to paste text or upload a file or write the text yourself.
+3. Click the button to run the analysis.
+4. View the sentiment, confidence, keywords, and explanation returned by the model.
