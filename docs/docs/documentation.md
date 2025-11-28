@@ -34,9 +34,8 @@ Our final choice was **Google Gemini**, mainly because:
 - It supports multiple tasks through prompting (sentiment, explanation, keywords).
 - It offers a generous free tier suitable for a student project.
 
-More detail on each of these points is provided below.
 
-### Reasons for choosing Gemini1. **Tight integration with Firebase**  
+### Reasons for choosing Google Gemini. **Tight integration with Firebase**  
 Gemini can be called directly from Firebase Functions and works well with Firestore triggers. This reduced the amount of backend code we had to write and made the pipeline simpler.
 
 **Multi-tasking via a single prompt**  
@@ -69,7 +68,13 @@ Because of these trade-offs, Gemini gave us the best balance of:
 
 ## 3. Implementation Challenges
 
-_(To be completed.)_
+During development we ran into several practical issues:
+- Deploying the app while keeping environment variables (API keys) secure
+- Getting consistent JSON-style output back from Gemini
+- Handling file uploads (especially `.pdf`) and extracting text
+- Token limits for very long documents
+
+
 
 ## 4. User Guide
 
