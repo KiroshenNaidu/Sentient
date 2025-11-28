@@ -23,7 +23,18 @@ This documentation focuses on three aspects:
 
 ## 2. API Selection Justification
 
-_(To be completed.)_
+We evaluated several possible NLP options before choosing between:
+- Google Gemini API
+- Hugging Face Inference API
+- AWS Comprehend
+- Azure Text Analytics
+
+Our final choice was **Google Gemini**, mainly because:
+- It integrates smoothly with Firebase.
+- It supports multiple tasks through prompting (sentiment, explanation, keywords).
+- It offers a generous free tier suitable for a student project.
+
+More detail on each of these points is provided below.
 
 ## 3. Implementation Challenges
 
