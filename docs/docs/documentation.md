@@ -74,6 +74,14 @@ During development we ran into several practical issues:
 - Handling file uploads (especially `.pdf`) and extracting text
 - Token limits for very long documents
 
+### 3.1 Secure handling of API keys
+We had to make sure the `GEMINI_API_KEY` was never exposed in the frontend or committed to GitHub. The solution was to keep the key in environment variables and access it only from server-side code (Firebase Functions / Next.js API routes). This added some setup complexity but is important for security.
+
+### 3.2 Consistent output format from Gemini
+Early prompts returned free-form text that was hard to parse. We refined the prompt to ask Gemini to respond in a strict JSON structure containing:
+- `sentiment` - `confidence` - `keywords` - `explanation`
+This made it easier for the UI to display results reliably.
+
 
 
 ## 4. User Guide
