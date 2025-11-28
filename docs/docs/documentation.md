@@ -36,6 +36,23 @@ Our final choice was **Google Gemini**, mainly because:
 
 More detail on each of these points is provided below.
 
+### Reasons for choosing Gemini1. **Tight integration with Firebase**  
+Gemini can be called directly from Firebase Functions and works well with Firestore triggers. This reduced the amount of backend code we had to write and made the pipeline simpler.
+
+**Multi-tasking via a single prompt**  
+   With one carefully designed prompt, Gemini can:
+   - classify sentiment,
+   - produce a confidence-style score,
+   - extract keywords, and
+   - generate a short explanation.  
+Other APIs would require multiple separate models or endpoints.
+
+**Cost and free-tier suitability**  
+As students, we needed a free solution. Gemini’s free tier plus the Firebase Spark plan allowed us to build and test the app without any paid services.
+
+**Good language understanding**  
+Gemini handles informal text, mixed sentiment, and longer reviews better than some simpler “rule-based” APIs.  
+
 ## 3. Implementation Challenges
 
 _(To be completed.)_
