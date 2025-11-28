@@ -51,7 +51,21 @@ Other APIs would require multiple separate models or endpoints.
 As students, we needed a free solution. Gemini’s free tier plus the Firebase Spark plan allowed us to build and test the app without any paid services.
 
 **Good language understanding**  
-Gemini handles informal text, mixed sentiment, and longer reviews better than some simpler “rule-based” APIs.  
+Gemini handles informal text, mixed sentiment, and longer reviews better than some simpler “rule-based” APIs. 
+
+### Alternatives considered
+**Hugging Face Inference API**
+- Pros: many specialised models, strong open-source community.
+- Cons: we would have needed separate models for sentiment and keyphrase extraction, plus custom hosting or a separate backend.
+  
+**AWS Comprehend / Azure Text Analytics**
+- Pros: production-grade services with dashboards.
+- Cons: more complex to set up for a small student project, and harder to integrate directly with our existing Firebase-based frontend.
+
+Because of these trade-offs, Gemini gave us the best balance of:
+- ease of integration,
+- flexibility through prompting, and
+- low cost.
 
 ## 3. Implementation Challenges
 
