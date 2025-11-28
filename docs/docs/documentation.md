@@ -6,7 +6,20 @@
 
 ## 1. Overview
 
-_(To be completed.)_
+Sentient is a web application that performs sentiment analysis on user-provided text and documents.  
+The system uses Firebase as the backend platform and Google’s Gemini model as the core NLP engine.  
+Users can submit text, `.txt` files, and `.pdf` files, and the app returns:
+
+- Overall sentiment (positive / neutral / negative)
+- A confidence score
+- Important keywords or phrases
+- A short explanation of why the text was classified that way
+
+This documentation focuses on three aspects:
+1. Why Gemini was selected as the primary API  
+2. The main implementation challenges we encountered  
+3. A user-oriented guide with practical examples
+
 
 ## 2. API Selection Justification
 
