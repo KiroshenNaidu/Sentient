@@ -107,6 +107,7 @@ git checkout -b feature/your-feature
 
 3. **Make your changes (keep TypeScript type safety)**
 
+
 4. **Submit a pull request with a clear description of your changes**
 
 You can also open issues for bugs, suggestions, or improvements.
